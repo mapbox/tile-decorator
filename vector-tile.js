@@ -83,7 +83,7 @@ function writeGeometry(geometry, pbf) {
         pbf.writeVarint(9);
 
         for (var j = 0; j < line.length; j += 2) {
-            if (i === 1) pbf.writeVarint(2 + (line.length / 2 - 1) << 3); // lineTo
+            if (j === 2) pbf.writeVarint(2 + (line.length / 2 - 1) << 3); // lineTo
 
             var dx = line[j] - x;
             var dy = line[j + 1] - y;
