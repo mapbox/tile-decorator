@@ -6,9 +6,16 @@
   "dependencies": {
     "pbf": "^1.3.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^1.10.3",
+    "eslint-config-mourner": "^1.0.1"
+  },
   "scripts": {
+    "pretest": "eslint index.js vector-tile.js bench/bench.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "eslintConfig": {
+    "extends": "mourner"  
   },
   "keywords": [],
   "author": "Vladimir Agafonkin",

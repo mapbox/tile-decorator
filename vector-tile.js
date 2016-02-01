@@ -1,18 +1,11 @@
-// Tile ========================================
+'use strict';
 
-var Tile = exports.Tile = {read: readTile, write: writeTile};
-
-Tile.GeomType = {
-    UNKNOWN: 0,
-    POINT: 1,
-    LINESTRING: 2,
-    POLYGON: 3
-};
+exports.readTile = readTile;
+exports.writeTile = writeTile;
 
 function readTile(pbf, end) {
     return pbf.readFields(readTileField, {layers: []}, end);
 }
-
 function readTileField(tag, tile, pbf) {
     if (tag === 3) tile.layers.push(readLayer(pbf, pbf.readVarint() + pbf.pos));
 }
@@ -109,7 +102,6 @@ function readFeature(pbf, end) {
     if (feature.type === undefined) feature.type = 0;
     return feature;
 }
-
 function readFeatureField(tag, feature, pbf) {
     if (tag === 1) feature.id = pbf.readVarint();
     else if (tag === 2) feature.tags = pbf.readPackedVarint();
@@ -129,7 +121,6 @@ function writeFeature(feature, pbf) {
 function readLayer(pbf, end) {
     return pbf.readFields(readLayerField, {features: [], keys: [], values: []}, end);
 }
-
 function readLayerField(tag, layer, pbf) {
     if (tag === 15) layer.version = pbf.readVarint();
     else if (tag === 1) layer.name = pbf.readString();

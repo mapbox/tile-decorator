@@ -10,12 +10,12 @@ exports.decorateLayer = decorateLayer;
 exports.mergeLayer = mergeLayer;
 
 function readTile(buf) {
-    return VT.Tile.read(new Pbf(buf));
+    return VT.readTile(new Pbf(buf));
 }
 
 function writeTile(tile) {
     var pbf = new Pbf();
-    VT.Tile.write(tile, pbf);
+    VT.writeTile(tile, pbf);
     return pbf.finish();
 }
 
