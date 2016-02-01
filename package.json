@@ -1,7 +1,7 @@
 {
   "name": "tile-decorator",
   "version": "1.0.0",
-  "description": "",
+  "description": "Modify vector tiles in JavaScript and reencode back",
   "main": "index.js",
   "dependencies": {
     "pbf": "^1.3.5"
@@ -15,7 +15,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "eslintConfig": {
-    "extends": "mourner"  
+    "extends": "mourner"
   },
   "keywords": [],
   "author": "Vladimir Agafonkin",
