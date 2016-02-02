@@ -1,0 +1,5 @@
+*.log
+coverage
+.nyc_output
+bench
+test
