@@ -8,11 +8,12 @@
   },
   "devDependencies": {
     "eslint": "^1.10.3",
-    "eslint-config-mourner": "^1.0.1"
+    "eslint-config-mourner": "^1.0.1",
+    "tap": "^5.4.2"
   },
   "scripts": {
-    "pretest": "eslint index.js vector-tile.js bench/bench.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pretest": "eslint *.js test/*.js bench/bench.js",
+    "test": "tap test/test.js"
   },
   "eslintConfig": {
     "extends": "mourner"

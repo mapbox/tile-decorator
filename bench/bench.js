@@ -4,7 +4,7 @@ var fs = require('fs');
 var path = require('path');
 var Decorator = require('../');
 
-var buf = fs.readFileSync(path.join(__dirname, 'test.pbf'));
+var buf = fs.readFileSync(path.join(__dirname, '../test/fixtures/test.pbf'));
 
 console.time('total');
 
