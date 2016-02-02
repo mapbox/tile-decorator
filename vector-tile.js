@@ -58,15 +58,24 @@ function readGeometry(pbf, end) {
             length = cmdLen >> 3;
         }
 
-        if (cmd === 1) {
-            line = [];
-            lines.push(line);
-        }
+        if (cmd === 1 || cmd === 2) {
+            if (cmd === 1) {
+                line = [];
+                lines.push(line);
+            }
 
-        x += pbf.readSVarint();
-        y += pbf.readSVarint();
-        line.push(x);
-        line.push(y);
+            x += pbf.readSVarint();
+            y += pbf.readSVarint();
+            line.push(x);
+            line.push(y);
+
+        } else if (cmd === 7) {
+            line.push(line[0]);
+            line.push(line[1]);
+
+        } else {
+            throw new Error('Unknown command ' + cmd);
+        }
 
         length--;
     }
@@ -74,16 +83,20 @@ function readGeometry(pbf, end) {
     return lines;
 }
 
-function writeGeometry(geometry, pbf) {
+function writeGeometry(feature, pbf) {
     var x = 0;
     var y = 0;
 
-    for (var i = 0; i < geometry.length; i++) {
-        var line = geometry[i];
+    for (var i = 0; i < feature.geometry.length; i++) {
+        var line = feature.geometry[i];
         pbf.writeVarint(9);
 
         for (var j = 0; j < line.length; j += 2) {
-            if (j === 2) pbf.writeVarint(2 + (line.length / 2 - 1) << 3); // lineTo
+            if (feature.type === 3 && j === line.length - 1 && line[j] === line[0] && line[j + 1] === line[1]) {
+                pbf.writeVarint(15); // closePath
+                break;
+            }
+            if (j === 2) pbf.writeVarint(2 + ((line.length / 2 - 1) << 3)); // lineTo
 
             var dx = line[j] - x;
             var dy = line[j + 1] - y;
@@ -98,9 +111,7 @@ function writeGeometry(geometry, pbf) {
 // Feature ========================================
 
 function readFeature(pbf, end) {
-    var feature = pbf.readFields(readFeatureField, {}, end);
-    if (feature.type === undefined) feature.type = 0;
-    return feature;
+    return pbf.readFields(readFeatureField, {}, end);
 }
 function readFeatureField(tag, feature, pbf) {
     if (tag === 1) feature.id = pbf.readVarint();
@@ -113,7 +124,7 @@ function writeFeature(feature, pbf) {
     if (feature.id !== undefined) pbf.writeVarintField(1, feature.id);
     if (feature.tags !== undefined) pbf.writePackedVarint(2, feature.tags);
     pbf.writeVarintField(3, feature.type);
-    pbf.writeMessage(4, writeGeometry, feature.geometry);
+    pbf.writeMessage(4, writeGeometry, feature);
 }
 
 // Layer ========================================
