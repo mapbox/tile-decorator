@@ -93,6 +93,40 @@ function mergeLayer(layer) {
             }
         }
     }
+
+    for (i = 0; i < layer.features.length; i++) {
+        layer.features[i].geometry = mergeLines(layer.features[i].geometry);
+    }
+}
+
+function mergeLines(geom) {
+    var starts = {};
+    var ends = {};
+    var newGeom = [];
+
+    for (var i = 0; i < geom.length; i++) {
+        var ring = geom[i];
+        var len = ring.length;
+        var startKey = zOrder(ring[0], ring[1]);
+        var endKey = zOrder(ring[len - 2], ring[len - 1]);
+
+        if (ends[startKey]) { // found line that ends where current start
+            for (var j = 2; j < len; j++) ends[startKey].push(ring[j]);
+            ends[endKey] = ends[startKey];
+            delete ends[startKey];
+
+        } else if (starts[endKey]) { // found line that starts where current ends
+            for (j = len - 3; j >= 0; j--) starts[endKey].unshift(ring[j]);
+            starts[startKey] = starts[endKey];
+            delete starts[endKey];
+
+        } else {
+            starts[startKey] = ring;
+            ends[endKey] = ring;
+            newGeom.push(ring);
+        }
+    }
+    return newGeom;
 }
 
 function addKey(key, keyLookup, keyIndex, keys, tags) {

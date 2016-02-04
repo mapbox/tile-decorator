@@ -31,14 +31,14 @@ test('getLayerValues', function (t) {
     t.end();
 });
 
-test('getLayerValues', function (t) {
+test('decorateLayer, mergeLayer', function (t) {
     var tile = Decorator.read(buf);
 
     var props = tile.layers[0].features.map(function () {
         return {foo: 'bar'};
     });
 
-    Decorator.decorateLayer(tile.layers[0], ['type', 'offset', 'glitter', 'hedgehogs'], props);
+    Decorator.decorateLayer(tile.layers[0], ['type', 'offset', 'glitter'], props);
     Decorator.mergeLayer(tile.layers[0]);
 
     t.deepEqual(tile, Decorator.read(decorated));
