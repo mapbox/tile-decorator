@@ -1,6 +1,6 @@
 {
   "name": "tile-decorator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Modify vector tiles in JavaScript and reencode back",
   "main": "index.js",
   "dependencies": {
