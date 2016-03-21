@@ -23,7 +23,7 @@ function readValue(pbf, end) {
         if (tag === 1) value = pbf.readString();
         else if (tag === 2) value = pbf.readFloat();
         else if (tag === 3) value = pbf.readDouble();
-        else if (tag === 4) value = pbf.readVarint();
+        else if (tag === 4) value = pbf.readVarint64();
         else if (tag === 5) value = pbf.readVarint();
         else if (tag === 6) value = pbf.readSVarint();
         else if (tag === 7) value = pbf.readBoolean();
@@ -60,8 +60,8 @@ function readGeometry(pbf, end) {
 
         if (cmd === 1 || cmd === 2) {
             if (cmd === 1) {
+                if (line) lines.push(line);
                 line = [];
-                lines.push(line);
             }
 
             x += pbf.readSVarint();
@@ -80,6 +80,8 @@ function readGeometry(pbf, end) {
         length--;
     }
 
+    if (line) lines.push(line);
+
     return lines;
 }
 
@@ -91,12 +93,14 @@ function writeGeometry(feature, pbf) {
         var line = feature.geometry[i];
         pbf.writeVarint(9);
 
-        for (var j = 0; j < line.length; j += 2) {
-            if (feature.type === 3 && j === line.length - 1 && line[j] === line[0] && line[j + 1] === line[1]) {
-                pbf.writeVarint(15); // closePath
-                break;
-            }
-            if (j === 2) pbf.writeVarint(2 + ((line.length / 2 - 1) << 3)); // lineTo
+        var len = line.length;
+
+        var closed = feature.type === 3 && line[len - 2] === line[0] && line[len - 1] === line[1];
+
+        if (closed) len -= 2;
+
+        for (var j = 0; j < len; j += 2) {
+            if (j === 2) pbf.writeVarint(2 + ((len / 2 - 1) << 3)); // lineTo
 
             var dx = line[j] - x;
             var dy = line[j + 1] - y;
@@ -105,6 +109,8 @@ function writeGeometry(feature, pbf) {
             x += dx;
             y += dy;
         }
+
+        if (closed) pbf.writeVarint(15); // closePath
     }
 }
 
