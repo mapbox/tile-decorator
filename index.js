@@ -83,7 +83,6 @@ function mergeLayer(layer) {
 
     for (var i = 0; i < features.length; i++) {
         if (!lastFeature || compareTags(features[i], lastFeature) !== 0) {
-            if (lastFeature) lastFeature.geometry.sort(compareLines);
             layer.features.push(features[i]);
             lastFeature = features[i];
         } else {
@@ -95,7 +94,11 @@ function mergeLayer(layer) {
     }
 
     for (i = 0; i < layer.features.length; i++) {
-        layer.features[i].geometry = mergeLines(layer.features[i].geometry);
+        var feature = layer.features[i];
+        if (feature.type === 2) { // lines
+            feature.geometry = mergeLines(feature.geometry);
+            feature.geometry.sort(compareLines);
+        }
     }
 }
 
