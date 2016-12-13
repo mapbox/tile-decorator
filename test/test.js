@@ -8,7 +8,6 @@ var Decorator = require('../');
 
 var buf = fs.readFileSync(path.join(__dirname, 'fixtures/test.pbf'));
 var buf2 = fs.readFileSync(path.join(__dirname, 'fixtures/streets.pbf'));
-var decorated = fs.readFileSync(path.join(__dirname, 'fixtures/test-decorated.pbf'));
 
 test('reads vector tiles into JSON and writes from JSON back to vector tiles', function (t) {
     var tile = Decorator.read(buf);
@@ -38,10 +37,12 @@ test('decorateLayer, mergeLayer', function (t) {
         return {foo: 'bar'};
     });
 
-    Decorator.decorateLayer(tile.layers[0], ['type', 'offset', 'glitter'], props);
+    var keys = ['type', 'offset', 'glitter'];
+    Decorator.decorateLayer(tile.layers[0], keys, props);
     Decorator.mergeLayer(tile.layers[0]);
 
-    t.deepEqual(tile, Decorator.read(decorated));
+    keys.push('foo');
+    t.deepEqual(tile.layers[0].keys, keys);
 
     t.end();
 });
