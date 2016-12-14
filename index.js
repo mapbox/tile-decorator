@@ -38,12 +38,14 @@ function getLayerValues(layer, key) {
     return values;
 }
 
-function decorateLayer(layer, keysToKeep, newProps) {
+function decorateLayer(layer, keysToKeep, newProps, requiredKeys) {
     var keys = layer.keys;
     var values = layer.values;
     var keyLookup = {};
     var valLookup = {};
     var keepLookup = {};
+    var requiredLookup = {};
+    var requiredCount = (requiredKeys || []).length;
     var keyIndex = 0;
     var valIndex = 0;
 
@@ -52,6 +54,16 @@ function decorateLayer(layer, keysToKeep, newProps) {
 
     for (var i = 0; i < keysToKeep.length; i++) {
         keepLookup[keys.indexOf(keysToKeep[i])] = true;
+    }
+
+    if (requiredCount) {
+        for (i = 0; i < requiredCount; i++) {
+            requiredLookup[keys.indexOf(requiredKeys[i])] = true;
+        }
+
+        layer.features = layer.features.filter(function (feature) {
+            return hasAllKeys(feature.tags, requiredLookup, requiredCount);
+        });
     }
 
     for (i = 0; i < layer.features.length; i++) {
@@ -190,4 +202,12 @@ function zOrder(x, y) {
     y = (y | (y << 1)) & 0x55555555;
 
     return x | (y << 1);
+}
+
+function hasAllKeys(tags, requiredLookup, requiredCount) {
+    var found = 0;
+    for (var i = 0; i < tags.length; i += 2) {
+        if (requiredLookup[tags[i]]) found++;
+    }
+    return found === requiredCount;
 }
