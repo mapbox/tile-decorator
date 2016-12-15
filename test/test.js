@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 var path = require('path');
-var test = require('tap').test;
+var test = require('tape').test;
 
 var Decorator = require('../');
 
