@@ -1,5 +1,5 @@
 {
-  "name": "tile-decorator",
+  "name": "@mapbox/tile-decorator",
   "version": "1.2.0",
   "description": "Modify vector tiles in JavaScript and reencode back",
   "main": "index.js",
