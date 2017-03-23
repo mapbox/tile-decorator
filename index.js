@@ -8,6 +8,7 @@ exports.write = writeTile;
 exports.getLayerValues = getLayerValues;
 exports.decorateLayer = decorateLayer;
 exports.mergeLayer = mergeLayer;
+exports.filterByKeys = filterByKeys;
 
 function readTile(buf) {
     return VT.readTile(new Pbf(buf));
@@ -38,14 +39,28 @@ function getLayerValues(layer, key) {
     return values;
 }
 
-function decorateLayer(layer, keysToKeep, newProps, requiredKeys) {
+function filterByKeys(layer, requiredKeys) {
+    var keys = layer.keys;
+    var requiredLookup = {};
+    var requiredCount = (requiredKeys || []).length;
+
+    if (requiredCount) {
+        for (var i = 0; i < requiredCount; i++) {
+            requiredLookup[keys.indexOf(requiredKeys[i])] = true;
+        }
+
+        layer.features = layer.features.filter(function (feature) {
+            return hasAllKeys(feature.tags, requiredLookup, requiredCount);
+        });
+    }
+}
+
+function decorateLayer(layer, keysToKeep, newProps) {
     var keys = layer.keys;
     var values = layer.values;
     var keyLookup = {};
     var valLookup = {};
     var keepLookup = {};
-    var requiredLookup = {};
-    var requiredCount = (requiredKeys || []).length;
     var keyIndex = 0;
     var valIndex = 0;
 
@@ -54,16 +69,6 @@ function decorateLayer(layer, keysToKeep, newProps, requiredKeys) {
 
     for (var i = 0; i < keysToKeep.length; i++) {
         keepLookup[keys.indexOf(keysToKeep[i])] = true;
-    }
-
-    if (requiredCount) {
-        for (i = 0; i < requiredCount; i++) {
-            requiredLookup[keys.indexOf(requiredKeys[i])] = true;
-        }
-
-        layer.features = layer.features.filter(function (feature) {
-            return hasAllKeys(feature.tags, requiredLookup, requiredCount);
-        });
     }
 
     for (i = 0; i < layer.features.length; i++) {
