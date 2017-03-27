@@ -42,17 +42,15 @@ function getLayerValues(layer, key) {
 function filterByKeys(layer, requiredKeys) {
     var keys = layer.keys;
     var requiredLookup = {};
-    var requiredCount = (requiredKeys || []).length;
+    var requiredCount = requiredKeys.length;
 
-    if (requiredCount) {
-        for (var i = 0; i < requiredCount; i++) {
-            requiredLookup[keys.indexOf(requiredKeys[i])] = true;
-        }
-
-        layer.features = layer.features.filter(function (feature) {
-            return hasAllKeys(feature.tags, requiredLookup, requiredCount);
-        });
+    for (var i = 0; i < requiredCount; i++) {
+        requiredLookup[keys.indexOf(requiredKeys[i])] = true;
     }
+
+    layer.features = layer.features.filter(function (feature) {
+        return hasAllKeys(feature.tags, requiredLookup, requiredCount);
+    });
 }
 
 function decorateLayer(layer, keysToKeep, newProps) {
