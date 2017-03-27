@@ -69,6 +69,10 @@ function decorateLayer(layer, keysToKeep, newProps) {
         keepLookup[keys.indexOf(keysToKeep[i])] = true;
     }
 
+    if (newProps && (newProps.length !== layer.features.length)) {
+        throw new Error('The length of newProps array does not match the number of features');
+    }
+
     for (i = 0; i < layer.features.length; i++) {
         var feature = layer.features[i];
         var tags = feature.tags;

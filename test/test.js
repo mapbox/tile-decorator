@@ -131,3 +131,21 @@ test('decorateLayer filtering half of the features', function (t) {
 
     t.end();
 });
+
+test('decorateLayer throwing on bad newProps', function (t) {
+    var tile = Decorator.read(buf);
+    var layer = tile.layers[0];
+
+    // Check initial values
+
+    var featureCount = layer.features.length;
+    t.equal(featureCount, 10031);
+
+    var props = [{foo: 1}, {bar: 5}];
+
+    t.throws(function () {
+        Decorator.decorateLayer(layer, ['id', 'type'], props);
+    });
+
+    t.end();
+});
