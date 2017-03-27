@@ -117,7 +117,8 @@ test('decorateLayer filtering half of the features', function (t) {
     keys = ['id', 'type', 'color', 'foo'];
     t.deepEqual(layer.keys, keys);
     var required = ['foo'];
-    Decorator.decorateLayer(layer, keys, null, required);
+    Decorator.filterByKeys(layer, required);
+    Decorator.decorateLayer(layer, keys, null);
 
     t.equal(layer.features.length, Math.floor(featureCount / 2));
     t.equal(getAttribute(layer, layer.features[0], 'id'), 14869996);
