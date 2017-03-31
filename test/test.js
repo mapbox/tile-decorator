@@ -8,7 +8,6 @@ var Decorator = require('../');
 
 var buf = fs.readFileSync(path.join(__dirname, 'fixtures/test.pbf'));
 var buf2 = fs.readFileSync(path.join(__dirname, 'fixtures/streets.pbf'));
-var decorated = fs.readFileSync(path.join(__dirname, 'fixtures/test-decorated.pbf'));
 
 // Looks up for a feature's attribute
 // See: mapbox/vector-tile-spec/tree/master/2.1#44-feature-attributes
@@ -77,10 +76,12 @@ test('decorateLayer, mergeLayer', function (t) {
         return {foo: 'bar'};
     });
 
-    Decorator.decorateLayer(tile.layers[0], ['type', 'offset', 'glitter'], props);
+    var keys = ['type', 'offset', 'glitter'];
+    Decorator.decorateLayer(tile.layers[0], keys, props);
     Decorator.mergeLayer(tile.layers[0]);
 
-    t.deepEqual(tile, Decorator.read(decorated));
+    keys.push('foo');
+    t.deepEqual(tile.layers[0].keys, keys);
 
     t.end();
 });
