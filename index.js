@@ -9,6 +9,7 @@ exports.getLayerValues = getLayerValues;
 exports.decorateLayer = decorateLayer;
 exports.mergeLayer = mergeLayer;
 exports.filterByKeys = filterByKeys;
+exports.selectKeys = selectKeys;
 
 function readTile(buf) {
     return VT.readTile(new Pbf(buf));
@@ -51,24 +52,21 @@ function filterByKeys(layer, requiredKeys) {
     layer.features = layer.features.filter(function (feature) {
         return hasAllKeys(feature.tags, requiredLookup, requiredCount);
     });
+
+    return layer;
 }
 
-function decorateLayer(layer, keysToKeep, newProps) {
+function selectKeys(layer, keysToKeep) {
     var keys = layer.keys;
     var values = layer.values;
-    var keyLookup = {};
-    var valLookup = {};
+    layer.keyLookup = {};
+    layer.valLookup = {};
     var keepLookup = {};
-
     layer.keys = [];
     layer.values = [];
 
     for (var i = 0; i < keysToKeep.length; i++) {
         keepLookup[keys.indexOf(keysToKeep[i])] = true;
-    }
-
-    if (newProps && (newProps.length !== layer.features.length)) {
-        throw new Error('The length of newProps array does not match the number of features');
     }
 
     for (i = 0; i < layer.features.length; i++) {
@@ -78,16 +76,33 @@ function decorateLayer(layer, keysToKeep, newProps) {
 
         for (var j = 0; j < tags.length; j += 2) {
             if (keepLookup[tags[j]]) {
-                addKey(keys[tags[j]], keyLookup, layer.keys, feature.tags);
-                addValue(values[tags[j + 1]], valLookup, layer.values, feature.tags);
+                addKey(keys[tags[j]], layer.keyLookup, layer.keys, feature.tags);
+                addValue(values[tags[j + 1]], layer.valLookup, layer.values, feature.tags);
             }
         }
-        if (!newProps) continue;
-        for (var id in newProps[i]) {
-            addKey(id, keyLookup, layer.keys, feature.tags);
-            addValue(newProps[i][id], valLookup, layer.values, feature.tags);
+    }
+
+    return layer;
+}
+
+function decorateLayer(layer, newProps) {
+    if (newProps && (newProps.length !== layer.features.length)) {
+        throw new Error('The length of newProps array does not match the number of features');
+    }
+
+    if (newProps) {
+        if (!layer.keyLookup || !layer.valLookup) buildKeyValueLookups(layer);
+
+        for (var i = 0; i < layer.features.length; i++) {
+            var feature = layer.features[i];
+            for (var id in newProps[i]) {
+                addKey(id, layer.keyLookup, layer.keys, feature.tags);
+                addValue(newProps[i][id], layer.valLookup, layer.values, feature.tags);
+            }
         }
     }
+
+    return layer;
 }
 
 function mergeLayer(layer) {
@@ -117,6 +132,8 @@ function mergeLayer(layer) {
             feature.geometry.sort(compareLines);
         }
     }
+
+    return layer;
 }
 
 function mergeLines(geom) {
@@ -159,9 +176,14 @@ function addKey(key, keyLookup, keys, tags) {
     tags.push(keyTag);
 }
 
-function addValue(val, valLookup, values, tags) {
+function getValueKey(val) {
     var valType = typeof val;
-    var valKey = valType !== 'number' ? valType + ':' + val : val;
+    return valType !== 'number' ? valType + ':' + val : val;
+}
+
+
+function addValue(val, valLookup, values, tags) {
+    var valKey = getValueKey(val);
     var valTag = valLookup[valKey];
     if (valTag === undefined) {
         valTag = values.length;
@@ -211,4 +233,16 @@ function hasAllKeys(tags, requiredLookup, requiredCount) {
         if (requiredLookup[tags[i]]) found++;
     }
     return found === requiredCount;
+}
+
+function buildKeyValueLookups(layer) {
+    layer.keyLookup = {};
+    layer.valLookup = {};
+    for (var k = 0; k < layer.keys.length; k++) {
+        layer.keyLookup[layer.keys[k]] = k;
+    }
+    for (var v = 0; v < layer.values.length; v++) {
+        var val = layer.values[v];
+        layer.valLookup[getValueKey(val)] = v;
+    }
 }

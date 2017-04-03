@@ -77,8 +77,12 @@ test('decorateLayer, mergeLayer', function (t) {
         return {foo: 'bar'};
     });
 
-    Decorator.decorateLayer(tile.layers[0], ['type', 'offset', 'glitter'], props);
+    Decorator.selectKeys(tile.layers[0], ['type', 'offset', 'glitter']);
+    Decorator.decorateLayer(tile.layers[0], props);
     Decorator.mergeLayer(tile.layers[0]);
+
+    delete tile.layers[0].keyLookup;
+    delete tile.layers[0].valLookup;
 
     t.deepEqual(tile, Decorator.read(decorated));
 
@@ -102,7 +106,8 @@ test('decorateLayer filtering half of the features', function (t) {
     var props = layer.features.map(function (feature, index) {
         return index % 2 === 1 ? {foo: 'bar'} : {color: 'red'};
     });
-    Decorator.decorateLayer(layer, keys, props);
+    Decorator.selectKeys(layer, keys);
+    Decorator.decorateLayer(layer, props);
     Decorator.mergeLayer(layer);
 
     t.true(layer.values.indexOf('bar') > 0);
@@ -118,7 +123,8 @@ test('decorateLayer filtering half of the features', function (t) {
     t.deepEqual(layer.keys, keys);
     var required = ['foo'];
     Decorator.filterByKeys(layer, required);
-    Decorator.decorateLayer(layer, keys, null);
+    Decorator.selectKeys(layer, keys);
+    Decorator.decorateLayer(layer, null);
 
     t.equal(layer.features.length, Math.floor(featureCount / 2));
     t.equal(getAttribute(layer, layer.features[0], 'id'), 14869996);
@@ -144,7 +150,7 @@ test('decorateLayer throwing on bad newProps', function (t) {
     var props = [{foo: 1}, {bar: 5}];
 
     t.throws(function () {
-        Decorator.decorateLayer(layer, ['id', 'type'], props);
+        Decorator.decorateLayer(layer, props);
     });
 
     t.end();
