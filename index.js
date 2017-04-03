@@ -59,8 +59,6 @@ function decorateLayer(layer, keysToKeep, newProps) {
     var keyLookup = {};
     var valLookup = {};
     var keepLookup = {};
-    var keyIndex = 0;
-    var valIndex = 0;
 
     layer.keys = [];
     layer.values = [];
@@ -80,14 +78,14 @@ function decorateLayer(layer, keysToKeep, newProps) {
 
         for (var j = 0; j < tags.length; j += 2) {
             if (keepLookup[tags[j]]) {
-                keyIndex = addKey(keys[tags[j]], keyLookup, keyIndex, layer.keys, feature.tags);
-                valIndex = addValue(values[tags[j + 1]], valLookup, valIndex, layer.values, feature.tags);
+                addKey(keys[tags[j]], keyLookup, layer.keys, feature.tags);
+                addValue(values[tags[j + 1]], valLookup, layer.values, feature.tags);
             }
         }
         if (!newProps) continue;
         for (var id in newProps[i]) {
-            keyIndex = addKey(id, keyLookup, keyIndex, layer.keys, feature.tags);
-            valIndex = addValue(newProps[i][id], valLookup, valIndex, layer.values, feature.tags);
+            addKey(id, keyLookup, layer.keys, feature.tags);
+            addValue(newProps[i][id], valLookup, layer.values, feature.tags);
         }
     }
 }
@@ -151,30 +149,26 @@ function mergeLines(geom) {
     return newGeom;
 }
 
-function addKey(key, keyLookup, keyIndex, keys, tags) {
+function addKey(key, keyLookup, keys, tags) {
     var keyTag = keyLookup[key];
     if (keyTag === undefined) {
-        keyTag = keyIndex;
-        keyLookup[key] = keyIndex;
+        keyTag = keys.length;
+        keyLookup[key] = keys.length;
         keys.push(key);
-        keyIndex++;
     }
     tags.push(keyTag);
-    return keyIndex;
 }
 
-function addValue(val, valLookup, valIndex, values, tags) {
+function addValue(val, valLookup, values, tags) {
     var valType = typeof val;
     var valKey = valType !== 'number' ? valType + ':' + val : val;
     var valTag = valLookup[valKey];
     if (valTag === undefined) {
-        valTag = valIndex;
-        valLookup[valKey] = valIndex;
+        valTag = values.length;
+        valLookup[valKey] = values.length;
         values.push(val);
-        valIndex++;
     }
     tags.push(valTag);
-    return valIndex;
 }
 
 function compareTags(a, b) {
