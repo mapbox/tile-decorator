@@ -59,9 +59,9 @@ function filterByKeys(layer, requiredKeys) {
 function selectKeys(layer, keysToKeep) {
     var keys = layer.keys;
     var values = layer.values;
+    var keepLookup = {};
     layer.keyLookup = {};
     layer.valLookup = {};
-    var keepLookup = {};
     layer.keys = [];
     layer.values = [];
 
@@ -86,19 +86,17 @@ function selectKeys(layer, keysToKeep) {
 }
 
 function decorateLayer(layer, newProps) {
-    if (newProps && (newProps.length !== layer.features.length)) {
+    if (!newProps || (newProps.length !== layer.features.length)) {
         throw new Error('The length of newProps array does not match the number of features');
     }
 
-    if (newProps) {
-        if (!layer.keyLookup || !layer.valLookup) buildKeyValueLookups(layer);
+    if (!layer.keyLookup || !layer.valLookup) buildKeyValueLookups(layer);
 
-        for (var i = 0; i < layer.features.length; i++) {
-            var feature = layer.features[i];
-            for (var id in newProps[i]) {
-                addKey(id, layer.keyLookup, layer.keys, feature.tags);
-                addValue(newProps[i][id], layer.valLookup, layer.values, feature.tags);
-            }
+    for (var i = 0; i < layer.features.length; i++) {
+        var feature = layer.features[i];
+        for (var id in newProps[i]) {
+            addKey(id, layer.keyLookup, layer.keys, feature.tags);
+            addValue(newProps[i][id], layer.valLookup, layer.values, feature.tags);
         }
     }
 

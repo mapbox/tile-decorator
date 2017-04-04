@@ -70,7 +70,7 @@ test('getLayerValues', function (t) {
     t.end();
 });
 
-test('decorateLayer, mergeLayer', function (t) {
+test('selectKeys, decorateLayer, mergeLayer', function (t) {
     var tile = Decorator.read(buf);
 
     var props = tile.layers[0].features.map(function () {
@@ -86,6 +86,21 @@ test('decorateLayer, mergeLayer', function (t) {
 
     t.deepEqual(tile, Decorator.read(decorated));
 
+    t.end();
+});
+
+test('decorateLayer, selectKeys, mergeLayer', function (t) {
+    var tile = Decorator.read(buf);
+
+    var props = tile.layers[0].features.map(function () {
+        return {foo: 'bar'};
+    });
+
+    Decorator.decorateLayer(tile.layers[0], props);
+    Decorator.selectKeys(tile.layers[0], ['type', 'foo']);
+    Decorator.mergeLayer(tile.layers[0]);
+
+    t.deepEqual(tile.layers[0].keys, ['type', 'foo']);
     t.end();
 });
 
@@ -124,7 +139,7 @@ test('decorateLayer filtering half of the features', function (t) {
     var required = ['foo'];
     Decorator.filterByKeys(layer, required);
     Decorator.selectKeys(layer, keys);
-    Decorator.decorateLayer(layer, null);
+    //Decorator.decorateLayer(layer, []);
 
     t.equal(layer.features.length, Math.floor(featureCount / 2));
     t.equal(getAttribute(layer, layer.features[0], 'id'), 14869996);
