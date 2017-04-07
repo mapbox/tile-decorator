@@ -6,10 +6,10 @@ var VT = require('./vector-tile.js');
 exports.read = readTile;
 exports.write = writeTile;
 exports.getLayerValues = getLayerValues;
-exports.decorateLayer = decorateLayer;
+exports.updateLayerProperties = updateLayerProperties;
 exports.mergeLayer = mergeLayer;
-exports.filterByKeys = filterByKeys;
-exports.selectKeys = selectKeys;
+exports.filterLayerByKeys = filterLayerByKeys;
+exports.selectLayerKeys = selectLayerKeys;
 
 function readTile(buf) {
     return VT.readTile(new Pbf(buf));
@@ -40,7 +40,7 @@ function getLayerValues(layer, key) {
     return values;
 }
 
-function filterByKeys(layer, requiredKeys) {
+function filterLayerByKeys(layer, requiredKeys) {
     var keys = layer.keys;
     var requiredLookup = {};
     var requiredCount = requiredKeys.length;
@@ -56,7 +56,7 @@ function filterByKeys(layer, requiredKeys) {
     return layer;
 }
 
-function selectKeys(layer, keysToKeep) {
+function selectLayerKeys(layer, keysToKeep) {
     var keys = layer.keys;
     var values = layer.values;
     var keepLookup = {};
@@ -85,7 +85,7 @@ function selectKeys(layer, keysToKeep) {
     return layer;
 }
 
-function decorateLayer(layer, newProps) {
+function updateLayerProperties(layer, newProps) {
     if (!newProps || (newProps.length !== layer.features.length)) {
         throw new Error('The length of newProps array does not match the number of features');
     }
