@@ -126,8 +126,8 @@ function mergeLayer(layer) {
     for (i = 0; i < layer.features.length; i++) {
         var feature = layer.features[i];
         if (feature.type === 2) { // lines
-            feature.geometry = mergeLines(feature.geometry);
             feature.geometry.sort(compareLines);
+            feature.geometry = mergeLines(feature.geometry);
         }
     }
 
