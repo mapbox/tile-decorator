@@ -145,10 +145,10 @@ function mergeLines(geom) {
         var len = ring.length;
         var startKey = zOrder(ring[0], ring[1]);
         var endKey = zOrder(ring[len - 2], ring[len - 1]);
-        console.log('----hi')
-        console.log(starts)
-        console.log(ends)
-        console.log(ring, startKey, endKey);
+        // console.log('----hi')
+        // console.log(starts)
+        // console.log(ends)
+        // console.log(ring, startKey, endKey);
         var checked = 0;
 
 
@@ -163,7 +163,7 @@ function mergeLines(geom) {
 
                     ring = ends[endKey];
                     startKey = zOrder(ring[0], ring[1]);
-                    console.log('new startKey', startKey);
+                    // console.log('new startKey', startKey);
                 } else if (starts[endKey]) { // found line that starts where current ends
                     for (j = len - 3; j >= 0; j--) starts[endKey].unshift(ring[j]);
                     starts[startKey] = starts[endKey];
@@ -172,11 +172,11 @@ function mergeLines(geom) {
                     ring = starts[startKey];
                     len = ring.length;
                     endKey = zOrder(ring[len - 2], ring[len - 1]);
-                    console.log('new endKey', endKey);
+                    // console.log('new endKey', endKey);
                 // } else {
                 //     break;
                 // }
-                console.log('checking again', ++checked);
+                // console.log('checking again', ++checked);
             // }
         } else {
             iters++;
@@ -184,17 +184,17 @@ function mergeLines(geom) {
             ends[endKey] = ring;
             // newGeom.push(ring);
         }
-        console.log(newGeom);
+        // console.log(newGeom);
 
 
-        console.log('-----------');
+        // console.log('-----------');
     }
 
     for (var key in starts) {
         newGeom.push(starts[key]);
     }
 
-    console.log('steps', iters);
+    // console.log('steps', iters);
     return newGeom;
 }
 
