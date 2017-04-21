@@ -154,24 +154,24 @@ function mergeLines(geom) {
 
 
         // if (ends[startKey] || starts[endKey]) {
-        //     while (true) {
+            // while (true) {
         //         iters++;
                 if (ends[startKey]) { // found line that ends where current start
                     for (var j = 2; j < len; j++) ends[startKey].push(ring[j]);
                     ends[endKey] = ends[startKey];
                     delete ends[startKey];
 
-                    ring = ends[endKey];
-                    startKey = zOrder(ring[0], ring[1]);
+                    // ring = ends[endKey];
+                    // startKey = zOrder(ring[0], ring[1]);
                     // console.log('new startKey', startKey);
                 } else if (starts[endKey]) { // found line that starts where current ends
                     for (j = len - 3; j >= 0; j--) starts[endKey].unshift(ring[j]);
                     starts[startKey] = starts[endKey];
                     delete starts[endKey];
 
-                    ring = starts[startKey];
-                    len = ring.length;
-                    endKey = zOrder(ring[len - 2], ring[len - 1]);
+                    // ring = starts[startKey];
+                    // len = ring.length;
+                    // endKey = zOrder(ring[len - 2], ring[len - 1]);
                     // console.log('new endKey', endKey);
                 // } else {
                 //     break;
