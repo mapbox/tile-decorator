@@ -139,28 +139,62 @@ function mergeLines(geom) {
     var ends = {};
     var newGeom = [];
 
+    var iters = 0;
     for (var i = 0; i < geom.length; i++) {
         var ring = geom[i];
         var len = ring.length;
         var startKey = zOrder(ring[0], ring[1]);
         var endKey = zOrder(ring[len - 2], ring[len - 1]);
+        console.log('----hi')
+        console.log(starts)
+        console.log(ends)
+        console.log(ring, startKey, endKey);
+        var checked = 0;
 
-        if (ends[startKey]) { // found line that ends where current start
-            for (var j = 2; j < len; j++) ends[startKey].push(ring[j]);
-            ends[endKey] = ends[startKey];
-            delete ends[startKey];
 
-        } else if (starts[endKey]) { // found line that starts where current ends
-            for (j = len - 3; j >= 0; j--) starts[endKey].unshift(ring[j]);
-            starts[startKey] = starts[endKey];
-            delete starts[endKey];
 
+        // if (ends[startKey] || starts[endKey]) {
+        //     while (true) {
+        //         iters++;
+                if (ends[startKey]) { // found line that ends where current start
+                    for (var j = 2; j < len; j++) ends[startKey].push(ring[j]);
+                    ends[endKey] = ends[startKey];
+                    delete ends[startKey];
+
+                    ring = ends[endKey];
+                    startKey = zOrder(ring[0], ring[1]);
+                    console.log('new startKey', startKey);
+                } else if (starts[endKey]) { // found line that starts where current ends
+                    for (j = len - 3; j >= 0; j--) starts[endKey].unshift(ring[j]);
+                    starts[startKey] = starts[endKey];
+                    delete starts[endKey];
+
+                    ring = starts[startKey];
+                    len = ring.length;
+                    endKey = zOrder(ring[len - 2], ring[len - 1]);
+                    console.log('new endKey', endKey);
+                // } else {
+                //     break;
+                // }
+                console.log('checking again', ++checked);
+            // }
         } else {
+            iters++;
             starts[startKey] = ring;
             ends[endKey] = ring;
-            newGeom.push(ring);
+            // newGeom.push(ring);
         }
+        console.log(newGeom);
+
+
+        console.log('-----------');
     }
+
+    for (var key in starts) {
+        newGeom.push(starts[key]);
+    }
+
+    console.log('steps', iters);
     return newGeom;
 }
 
