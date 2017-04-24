@@ -169,3 +169,16 @@ test('updateLayerProperties throwing on bad newProps', function (t) {
 
     t.end();
 });
+
+
+test('mergeLayer -- coalesces lines', function (t) {
+    var input = require(path.join(__dirname, 'fixtures/linemerge-input.json')); // eslint-disable-line global-require
+    var expected = require(path.join(__dirname, 'fixtures/linemerge-output.json')); // eslint-disable-line global-require
+
+    Decorator.mergeLayer(input);
+
+    delete input.valLookup;
+    delete input.keyLookup;
+
+    t.deepEqual(input, expected);
+});

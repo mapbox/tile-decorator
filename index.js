@@ -156,7 +156,6 @@ function mergeLines(geom) {
             delete starts[endKey];
 
         } else {
-            iters++;
             starts[startKey] = ring;
             ends[endKey] = ring;
         }
