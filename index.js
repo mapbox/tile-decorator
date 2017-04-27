@@ -126,8 +126,8 @@ function mergeLayer(layer) {
     for (i = 0; i < layer.features.length; i++) {
         var feature = layer.features[i];
         if (feature.type === 2) { // lines
-            feature.geometry = mergeLines(feature.geometry);
             feature.geometry.sort(compareLines);
+            feature.geometry = mergeLines(feature.geometry);
         }
     }
 
@@ -145,17 +145,34 @@ function mergeLines(geom) {
         var startKey = zOrder(ring[0], ring[1]);
         var endKey = zOrder(ring[len - 2], ring[len - 1]);
 
-        if (ends[startKey]) { // found line that ends where current start
-            for (var j = 2; j < len; j++) ends[startKey].push(ring[j]);
-            ends[endKey] = ends[startKey];
-            delete ends[startKey];
+        var endMatch = ends[startKey],
+            startMatch = starts[endKey],
+            matched = false;
 
-        } else if (starts[endKey]) { // found line that starts where current ends
-            for (j = len - 3; j >= 0; j--) starts[endKey].unshift(ring[j]);
-            starts[startKey] = starts[endKey];
-            delete starts[endKey];
+        if (endMatch) { // found line that ends where current start
+            var prev = zOrder(endMatch[endMatch.length - 4], endMatch[endMatch.length - 3]);
+            var next = zOrder(ring[2], ring[3]);
+            if (prev !== next) {
+                for (var j = 2; j < len; j++) ends[startKey].push(ring[j]);
+                ends[endKey] = ends[startKey];
+                delete ends[startKey];
+                matched = true;
+            }
+        }
 
-        } else {
+        if (startMatch) { // found line that starts where current ends
+            var next = zOrder(startMatch[2], startMatch[3]);
+            var prev = zOrder(ring[len - 4], ring[len - 3]);
+            if (next !== prev) {
+                for (j = len - 3; j >= 0; j--) starts[endKey].unshift(ring[j]);
+                starts[startKey] = starts[endKey];
+                delete starts[endKey];
+                matched = true;
+            }
+
+        }
+
+        if (!matched) {
             starts[startKey] = ring;
             ends[endKey] = ring;
             newGeom.push(ring);
