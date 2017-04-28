@@ -144,16 +144,16 @@ function mergeLines(geom) {
         var len = ring.length;
         var startKey = zOrder(ring[0], ring[1]);
         var endKey = zOrder(ring[len - 2], ring[len - 1]);
-
-        var endMatch = ends[startKey],
-            startMatch = starts[endKey],
-            matched = false;
+        var endMatch = ends[startKey];
+        var startMatch = starts[endKey];
+        var matched = false;
+        var prev, next, j;
 
         if (endMatch) { // found line that ends where current start
-            var prev = zOrder(endMatch[endMatch.length - 4], endMatch[endMatch.length - 3]);
-            var next = zOrder(ring[2], ring[3]);
+            prev = zOrder(endMatch[endMatch.length - 4], endMatch[endMatch.length - 3]);
+            next = zOrder(ring[2], ring[3]);
             if (prev !== next) {
-                for (var j = 2; j < len; j++) ends[startKey].push(ring[j]);
+                for (j = 2; j < len; j++) ends[startKey].push(ring[j]);
                 ends[endKey] = ends[startKey];
                 delete ends[startKey];
                 matched = true;
@@ -161,15 +161,14 @@ function mergeLines(geom) {
         }
 
         if (startMatch) { // found line that starts where current ends
-            var next = zOrder(startMatch[2], startMatch[3]);
-            var prev = zOrder(ring[len - 4], ring[len - 3]);
+            next = zOrder(startMatch[2], startMatch[3]);
+            prev = zOrder(ring[len - 4], ring[len - 3]);
             if (next !== prev) {
                 for (j = len - 3; j >= 0; j--) starts[endKey].unshift(ring[j]);
                 starts[startKey] = starts[endKey];
                 delete starts[endKey];
                 matched = true;
             }
-
         }
 
         if (!matched) {
