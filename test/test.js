@@ -7,7 +7,6 @@ var test = require('tape').test;
 var Decorator = require('../');
 
 var buf = fs.readFileSync(path.join(__dirname, 'fixtures/test.pbf'));
-var buf2 = fs.readFileSync(path.join(__dirname, 'fixtures/streets.pbf'));
 var decorated = fs.readFileSync(path.join(__dirname, 'fixtures/test-decorated.pbf'));
 
 // Looks up for a feature's attribute
@@ -53,11 +52,6 @@ test('reads vector tiles into JSON and writes from JSON back to vector tiles', f
     var tile = Decorator.read(buf);
     var newBuf = Decorator.write(tile);
     var tile2 = Decorator.read(newBuf);
-    t.deepEqual(tile, tile2);
-
-    tile = Decorator.read(buf2);
-    newBuf = Decorator.write(tile);
-    tile2 = Decorator.read(newBuf);
     t.deepEqual(tile, tile2);
 
     t.end();
