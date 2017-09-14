@@ -10,6 +10,8 @@ exports.updateLayerProperties = updateLayerProperties;
 exports.mergeLayer = mergeLayer;
 exports.filterLayerByKeys = filterLayerByKeys;
 exports.selectLayerKeys = selectLayerKeys;
+exports.convertChsName2 = convertChsName2;
+
 
 function readTile(buf) {
     return VT.readTile(new Pbf(buf));
@@ -259,4 +261,63 @@ function buildKeyValueLookups(layer) {
         var val = layer.values[v];
         layer.valLookup[getValueKey(val)] = v;
     }
+}
+
+
+function isChinese(temp)
+{
+    var re = /^[\u3220-\uFA29]+$/;
+    if (re.test(temp)) 
+        return true;
+    return false;
+}
+
+function getAttribute(layer, feature, attribute) {
+    // Check if attribute exists in layer
+    var attributeKeyIndex = layer.keys.indexOf(attribute);
+    if (attributeKeyIndex === -1) return null;
+
+    // Scan feature's tags to find a matching key and return its value
+    for (var i = 0, j = feature.tags.length; i < j; i += 2) {
+        if (feature.tags[i] === attributeKeyIndex) {
+            return layer.values[feature.tags[i + 1]];
+        }
+    }
+
+    return null;
+}
+
+function convertChsName2(originPbf)
+{
+    var tile = readTile(originPbf);
+
+    for (var i = 0; i < tile.layers.length; i++)
+    {
+        if(tile.layers[i].name != 'poi_label')
+            continue;
+    
+        buildKeyValueLookups(tile.layers[i]);
+            
+        for (var j = 0; j < tile.layers[i].features.length; j++)
+        {
+            console.log(tile.layers[i].features[j].geometry);
+            if(tile.layers[i].features[j].geometry.type == 'Point')
+                continue;
+                
+            var name = getAttribute(tile.layers[i], tile.layers[i].features[j], 'name_zh');
+            
+            if(name == null)
+                continue;
+    
+            if(isChinese(name))
+            {
+                addKey("name_zh2", tile.layers[i].keyLookup, tile.layers[i].keys,
+                    tile.layers[i].features[j].tags);
+                addValue(name, tile.layers[i].valLookup, tile.layers[i].values,
+                    tile.layers[i].features[j].tags);
+            }
+        }
+    }
+    
+    return writeTile(tile);
 }
