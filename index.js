@@ -224,7 +224,18 @@ function compareTags(a, b) {
 }
 
 function compareLines(a, b) {
-    return zOrder(a[0], a[1]) - zOrder(b[0], b[1]);
+    let za = zOrder(a[0], a[1]);
+    let zb = zOrder(b[0], b[1]);
+    if (za !== zb) {
+        return za - zb;
+    }
+    if (a[0] !== b[0]) {
+        return a[0] - b[0];
+    }
+    if (a[1] !== b[1]) {
+        return a[1] - b[1];
+    }
+    return za;
 }
 
 function zOrder(x, y) {

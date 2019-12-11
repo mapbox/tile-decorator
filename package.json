@@ -9,7 +9,7 @@
   "devDependencies": {
     "eslint": "^3.12.2",
     "eslint-config-mourner": "^2.0.1",
-    "tape": "^4.6.3"
+    "tape": "^4.11.0"
   },
   "scripts": {
     "pretest": "eslint *.js test/*.js bench/bench.js",
