@@ -1,6 +1,6 @@
 {
   "name": "@mapbox/tile-decorator",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Modify vector tiles in JavaScript and reencode back",
   "main": "index.js",
   "dependencies": {
@@ -20,5 +20,8 @@
   },
   "keywords": [],
   "author": "Vladimir Agafonkin",
-  "license": "ISC"
+  "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  }
 }
